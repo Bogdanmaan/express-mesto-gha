@@ -13,6 +13,12 @@ const getUserById = (req, res) => {
       }
       return res.status(200).send(user);
     })
+    .then((user) => {
+      if (!user) {
+        return res.status(400).send({ message: 'Запрашиваемый пользователь не найден' });
+      }
+      return res.status(200).send(user);
+    })
     .catch((err) => res.status(500).send({ message: 'Ошибка' }));
 };
 
@@ -31,13 +37,13 @@ const createUser = (req, res) => {
 
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id)
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
+    .then((user) => {
+      if (!user) {
         return res.status(400).send({ message: 'Некорректные данные' });
       }
-      return res.status(500).send({ message: 'Ошибка' });
-    });
+      return res.status(200).send(user);
+    })
+    .catch((err) => res.status(500).send({ message: 'Ошибка' }));
 };
 
 const updateAvatar = (req, res) => {
