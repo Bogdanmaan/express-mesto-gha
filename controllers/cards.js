@@ -7,7 +7,7 @@ const createCard = (req, res) => {
   const newCardData = req.body;
 
   return Card.create(newCardData)
-    .then((newCard) => res.status(201).send(newCard))
+    .then((newCard) => res.status(200).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Некорректные данные' });
@@ -23,7 +23,7 @@ const deleteCardById = (req, res) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.status(201).send(card);
+      return res.status(200).send(card);
     });
 };
 
