@@ -39,7 +39,7 @@ const likeCard = (req, res) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.status(201).send('Вы лайкнули карточку');
+      return res.status(201).send({ message: 'Ваш лайк удалён' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -59,7 +59,7 @@ const dislikeCard = (req, res) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.status(201).send('Ваш лайк удалён');
+      return res.status(201).send({ message: 'Ваш лайк удалён' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
