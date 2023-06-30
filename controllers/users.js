@@ -1,25 +1,20 @@
-/* eslint-disable no-unused-vars */
 const User = require('../models/users');
 
 const getUsers = (req, res) => User.find({})
-  .then((users) => res.status(200).send(users));
+  .then((users) => res.status(200).send(users))
+  .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
 
 const getUserById = (req, res) => {
   const { userId } = req.params;
   return User.findById(userId)
     .then((user) => {
+      const ERROR_CODE = 404;
       if (!user) {
-        return res.status(404).send({ message: 'Запрашиваемый пользователь не найден' });
+        return res.status(ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
       }
       return res.status(200).send(user);
     })
-    .then((user) => {
-      if (!user) {
-        return res.status(400).send({ message: 'Запрашиваемый пользователь не найден' });
-      }
-      return res.status(200).send(user);
-    })
-    .catch((err) => res.status(500).send({ message: 'Ошибка' }));
+    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
 };
 
 const createUser = (req, res) => {
@@ -36,18 +31,20 @@ const createUser = (req, res) => {
 };
 
 const updateUser = (req, res) => {
-  User.findByIdAndUpdate(req.user._id)
+  const { name, about } = req.body;
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         return res.status(400).send({ message: 'Некорректные данные' });
       }
       return res.status(200).send(user);
     })
-    .catch((err) => res.status(500).send({ message: 'Ошибка' }));
+    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
 };
 
 const updateAvatar = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, { avatar: 'https://yandex.ru/images/search?text=картинки&img_url=https%3A%2F%2Fwww.1zoom.me%2Fbig2%2F541%2F255095-Sepik.jpg&pos=1&rpt=simage&stype=image&lr=213&parent-reqid=1687787311559725-15310763039287171511-balancer-l7leveler-kubr-yp-sas-159-BAL-1744&source=serp' })
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -56,8 +53,6 @@ const updateAvatar = (req, res) => {
       return res.status(500).send({ message: 'Ошибка' });
     });
 };
-
-// const deleteUserById = (req, res) => {};
 
 module.exports = {
   getUsers,

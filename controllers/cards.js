@@ -1,12 +1,13 @@
 const Card = require('../models/cards');
 
 const getCards = (req, res) => Card.find({})
-  .then((cards) => res.status(200).send(cards));
+  .then((cards) => res.status(200).send(cards))
+  .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
 
 const createCard = (req, res) => {
-  const newCardData = req.body;
-
-  return Card.create(newCardData)
+  const { name, link } = req.body;
+  return Card.create({ name, link, owner: req.user._id })
+    .then((card) => card.populate('owner'))
     .then((newCard) => res.status(200).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -23,24 +24,25 @@ const deleteCardById = (req, res) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.status(200).send(card);
-    });
+      return res.status(200).send('Карточка удалена');
+    })
+    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
 };
 
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.status(201).send(card);
+      return res.status(201).send('Вы лайкнули карточку');
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Некорректные данные' });
       }
       return res.status(500).send({ message: 'Ошибка' });
@@ -50,17 +52,17 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.status(201).send(card);
+      return res.status(201).send('Ваш лайк удалён');
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Некорректные данные' });
       }
       return res.status(500).send({ message: 'Ошибка' });
