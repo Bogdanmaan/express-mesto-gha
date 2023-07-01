@@ -1,20 +1,28 @@
 const User = require('../models/users');
 
+const ERROR_CODE_NOT_FOUND = 404;
+const ERROR_CODE = 400;
+const ERROR = 500;
+
 const getUsers = (req, res) => User.find({})
   .then((users) => res.status(200).send(users))
-  .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
+  .catch((err) => res.status(ERROR).send({ message: `Ошибка ${err}` }));
 
 const getUserById = (req, res) => {
   const { userId } = req.params;
   return User.findById(userId)
     .then((user) => {
-      const ERROR_CODE = 404;
       if (!user) {
-        return res.status(ERROR_CODE).send({ message: 'Запрашиваемый пользователь не найден' });
+        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Запрашиваемый пользователь не найден' });
       }
       return res.status(200).send(user);
     })
-    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE).send({ message: 'Некорректные данные' });
+      }
+      return res.status(ERROR).send({ message: 'Ошибка' });
+    });
 };
 
 const createUser = (req, res) => {
@@ -24,9 +32,9 @@ const createUser = (req, res) => {
     .then((newUser) => res.status(201).send(newUser))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Некорректные данные' });
+        return res.status(ERROR_CODE).send({ message: 'Некорректные данные' });
       }
-      return res.status(500).send({ message: 'Ошибка' });
+      return res.status(ERROR).send({ message: 'Ошибка' });
     });
 };
 
@@ -35,11 +43,16 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(400).send({ message: 'Некорректные данные' });
+        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь не найден' });
       }
       return res.status(200).send(user);
     })
-    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(ERROR_CODE).send({ message: 'Некорректные данные' });
+      }
+      return res.status(ERROR).send({ message: `Ошибка ${err}` });
+    });
 };
 
 const updateAvatar = (req, res) => {
@@ -48,9 +61,9 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Некорректные данные' });
+        return res.status(ERROR_CODE).send({ message: 'Некорректные данные' });
       }
-      return res.status(500).send({ message: 'Ошибка' });
+      return res.status(ERROR).send({ message: 'Ошибка' });
     });
 };
 
