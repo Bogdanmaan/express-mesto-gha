@@ -28,12 +28,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(userRouter);
+app.use(cardRouter);
+
 app.use('*', (req, res) => {
   res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Несуществующий адрес' });
 });
-
-app.use(userRouter);
-app.use(cardRouter);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
