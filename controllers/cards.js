@@ -3,16 +3,18 @@ const Card = require('../models/cards');
 const ERROR_CODE_NOT_FOUND = 404;
 const ERROR_CODE = 400;
 const ERROR = 500;
+const NO_ERR = 200;
+const NO_ERROR = 201;
 
 const getCards = (req, res) => Card.find({})
-  .then((cards) => res.status(200).send(cards))
+  .then((cards) => res.status(NO_ERR).send(cards))
   .catch((err) => res.status(ERROR).send({ message: `Ошибка ${err}` }));
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
   return Card.create({ name, link, owner: req.user._id })
     .then((card) => card.populate('owner'))
-    .then((newCard) => res.status(200).send(newCard))
+    .then((newCard) => res.status(NO_ERR).send(newCard))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE).send({ message: 'Некорректные данные' });
@@ -28,7 +30,7 @@ const deleteCardById = (req, res) => {
       if (!card) {
         return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Карточка не найдена' });
       }
-      return res.status(200).send({ message: 'Карточка удалена' });
+      return res.status(NO_ERR).send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -48,7 +50,7 @@ const likeCard = (req, res) => {
       if (!card) {
         return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Карточка не найдена' });
       }
-      return res.status(201).send({ message: 'Вы поставили лайк' });
+      return res.status(NO_ERROR).send({ message: 'Вы поставили лайк' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -68,7 +70,7 @@ const dislikeCard = (req, res) => {
       if (!card) {
         return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Карточка не найдена' });
       }
-      return res.status(200).send({ message: 'Ваш лайк удалён' });
+      return res.status(NO_ERR).send({ message: 'Ваш лайк удалён' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

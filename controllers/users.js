@@ -3,9 +3,11 @@ const User = require('../models/users');
 const ERROR_CODE_NOT_FOUND = 404;
 const ERROR_CODE = 400;
 const ERROR = 500;
+const NO_ERR = 200;
+const NO_ERROR = 201;
 
 const getUsers = (req, res) => User.find({})
-  .then((users) => res.status(200).send(users))
+  .then((users) => res.status(NO_ERR).send(users))
   .catch((err) => res.status(ERROR).send({ message: `Ошибка ${err}` }));
 
 const getUserById = (req, res) => {
@@ -15,7 +17,7 @@ const getUserById = (req, res) => {
       if (!user) {
         return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Запрашиваемый пользователь не найден' });
       }
-      return res.status(200).send(user);
+      return res.status(NO_ERR).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -29,7 +31,7 @@ const createUser = (req, res) => {
   const newUserData = req.body;
 
   return User.create(newUserData)
-    .then((newUser) => res.status(201).send(newUser))
+    .then((newUser) => res.status(NO_ERROR).send(newUser))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE).send({ message: 'Некорректные данные' });
@@ -45,7 +47,7 @@ const updateUser = (req, res) => {
       if (!user) {
         return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь не найден' });
       }
-      return res.status(200).send(user);
+      return res.status(NO_ERR).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
