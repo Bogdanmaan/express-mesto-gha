@@ -1,21 +1,17 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/users");
-const BadRequestError = require("../errors/bad-request-error");
-const NotFoundError = require("../errors/not-found-error");
-const ConflictError = require("../errors/conflict-error");
-const ForbiddenError = require("../errors/forbidden-error");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/users');
+const BadRequestError = require('../errors/bad-request-error');
+const NotFoundError = require('../errors/not-found-error');
+const ConflictError = require('../errors/conflict-error');
+const ForbiddenError = require('../errors/forbidden-error');
 
-// const ERROR_CODE_NOT_FOUND = 404;
-// const ERROR_CODE = 400;
-// const ERROR = 500;
 const NO_ERR = 200;
 const NO_ERROR = 201;
 
-const getUsers = (req, res, next) =>
-  User.find({})
-    .then((users) => res.status(NO_ERR).send(users))
-    .catch((err) => next(err));
+const getUsers = (req, res, next) => User.find({})
+  .then((users) => res.status(NO_ERR).send(users))
+  .catch((err) => next(err));
 
 const getUserById = (req, res, next) => {
   const { userId } = req.params;
@@ -23,17 +19,15 @@ const getUserById = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new NotFoundError({
-          message: "Запрашиваемый пользователь не найден",
+          message: 'Запрашиваемый пользователь не найден',
         });
       }
       return res.status(NO_ERR).send(user);
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        throw new BadRequestError({ message: "Некорректные данные" });
+      if (err.name === 'CastError') {
+        return next(new BadRequestError({ message: 'Некорректные данные' }));
       }
-      next(err);
-      // return res.status(ERROR).send({ message: "Ошибка" });
     });
 };
 
@@ -43,20 +37,16 @@ const createUser = (req, res, next) => {
   return User.findOne({ email })
     .then((newUser) => {
       if (newUser) {
-        throw new ConflictError({ message: "Пользователь уже существует" });
+        throw new ConflictError({ message: 'Пользователь уже существует' });
       }
-      bcrypt.hash(req.body.password, 10).then((hash) => {
-        return User.create({ email, password: hash }).then((newUser) => {
-          return res.status(NO_ERROR).send(newUser);
-        });
-      });
+      bcrypt.hash(req.body.password, 10)
+        .then((hash) => User.create({ email, password: hash })
+        .then((newUser) => res.status(NO_ERROR).send(newUser)));
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError({ message: "Некорректные данные" });
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError({ message: 'Некорректные данные' }));
       }
-      next(err);
-      // return res.status(ERROR).send({ message: "Ошибка" });
     });
 };
 
@@ -65,22 +55,20 @@ const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => {
       if (!user) {
         throw new NotFoundError({
-          message: "Запрашиваемый пользователь не найден",
+          message: 'Запрашиваемый пользователь не найден',
         });
       }
       return res.status(NO_ERR).send(user);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError({ message: "Некорректные данные" });
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError({ message: 'Некорректные данные' }));
       }
-      next(err);
-      // return res.status(ERROR).send({ message: `Ошибка ${err}` });
     });
 };
 
@@ -89,15 +77,13 @@ const updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { avatar },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError({ message: "Некорректные данные" });
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError({ message: 'Некорректные данные' }));
       }
-      next(err);
-      // return res.status(ERROR).send({ message: "Ошибка" });
     });
 };
 
@@ -105,29 +91,29 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findOne({ email })
-    .select("+password")
+    .select('+password')
     .then((newUser) => {
       if (!newUser) {
-        throw new ForbiddenError({ message: "Пользователь не существует" });
+        throw new ForbiddenError({ message: 'Пользователь не существует' });
       }
       bcrypt.compare(password, newUser.password).then((matched) => {
         if (!matched) {
-          throw new ForbiddenError({
-            message: "Не правильный почта или пароль",
-          });
+          return next(
+            new ForbiddenError({
+              message: 'Не правильный почта или пароль',
+            }),
+          );
         }
-        const token = jwt.sign({ _id: newUser._id }, "secretKey", {
-          expiresIn: "7d",
+        const token = jwt.sign({ _id: newUser._id }, 'secretKey', {
+          expiresIn: '7d',
         });
         return res.status(NO_ERROR).send({ token });
       });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError({ message: "Некорректные данные" });
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError({ message: 'Некорректные данные' }));
       }
-      next(err);
-      // return res.status(ERROR).send({ message: "Ошибка" });
     });
 };
 
