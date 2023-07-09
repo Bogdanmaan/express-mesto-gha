@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
-
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -13,9 +11,9 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: function(v) {
-        return /http[s]?:\/\/(www\.)?[\w\d\-\._~:/?#[]@!$&'()*+,;=]+#? /im.test(v),
-      },
+      // eslint-disable-next-line no-useless-escape
+      validator: (v) => /http[s]?:\/\/(www\.)?[\w\d\-\._~:\?#@!$&'()*+,;=[]+#?/gim.test(v),
+      message: 'Неверная ссылка',
     },
   },
   owner: {
