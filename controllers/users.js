@@ -40,9 +40,9 @@ const createUser = (req, res, next) => {
       if (newUser) {
         throw new ConflictError({ message: 'Пользователь уже существует' });
       }
-      bcrypt.hash(req.body.password, 10)
+      bcrypt.hash(password, 10)
         .then((hash) => User.create({ email, password: hash })
-        .then((newUser) => res.status(NO_ERROR).send(newUser)));
+          .then((user) => res.status(NO_ERROR).send(user)));
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
