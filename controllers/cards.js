@@ -28,8 +28,8 @@ const deleteCardById = (req, res, next) => {
     .populate('owner')
     .then((card) => {
       if (req.user._id === card.owner._id) {
-        Card.findByIdAndDelete(cardId).then((card) => {
-          if (!card) {
+        Card.findByIdAndDelete(cardId).then((needCard) => {
+          if (!needCard) {
             throw new NotFoundError({ message: 'Карточка не найдена' });
           }
           return res.status(NO_ERR).send({ message: 'Карточка удалена' });

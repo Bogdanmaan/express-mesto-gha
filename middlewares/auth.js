@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const AuthError = require('../errors/auth-error');
 
-module.exports = (req, res, next) => {
+const Auth = (req, res, next) => {
   // достаём авторизационный заголовок
   const { authorization } = req.headers;
 
@@ -24,3 +24,5 @@ module.exports = (req, res, next) => {
   req.user = payload;
   next();
 };
+
+module.exports = Auth;

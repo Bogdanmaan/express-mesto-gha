@@ -1,5 +1,8 @@
 const router = require('express').Router();
+
 const { celebrate, Joi } = require('celebrate');
+// eslint-disable-next-line no-useless-escape
+const urlRegExp = /http[s]?:\/\/(www\.)?[\w\d\-\._~:\?#@!$&'()*+,;=[]+#?/gim;
 
 const {
   getCards,
@@ -26,7 +29,7 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().required(),
+      link: Joi.string().required().pattern(urlRegExp),
       owner: Joi.object(),
       likes: Joi.array(),
       createdAt: Joi.date(),

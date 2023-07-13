@@ -5,16 +5,18 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const { errors, celebrate, Joi } = require('celebrate');
+
 const { createUser, login } = require('./controllers/users');
 
 const userRouter = require('./routes/users');
 
 const cardRouter = require('./routes/cards');
 
-const auth = require('./middlewares/auth');
-
 const NotFoundError = require('./errors/not-found-error');
+
 const errorHandler = require('./middlewares/error-handler');
+
+const Auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 
@@ -50,7 +52,7 @@ app.post(
   login,
 );
 
-app.use(auth);
+app.use(Auth);
 
 app.use(userRouter);
 app.use(cardRouter);
