@@ -15,8 +15,10 @@ const cardRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
 
 const NotFoundError = require('./errors/not-found-error');
-
 const errorHandler = require('./middlewares/error-handler');
+
+// eslint-disable-next-line no-useless-escape
+const urlRegExp = /http[s]?:\/\/(www\.)?[\w\d\-\._~:\?#@!$&'()*+,;=[]+#?/im;
 
 const { PORT = 3000 } = process.env;
 
@@ -37,7 +39,7 @@ app.post(
 
       about: Joi.string().required().min(2).max(30),
 
-      avatar: Joi.link(),
+      avatar: Joi.link().pattern(urlRegExp),
 
       email: Joi.string().required().email(),
 
