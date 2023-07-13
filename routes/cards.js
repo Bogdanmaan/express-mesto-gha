@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const { celebrate, Joi } = require('celebrate');
 // eslint-disable-next-line no-useless-escape
-const urlRegExp = /http[s]?:\/\/(www\.)?[\w\d\-\._~:\?#@!$&'()*+,;=[]+#?/gim;
+const urlRegExp = /http[s]?:\/\/(www\.)?[\w\d\-\._~:\?#@!$&'()*+,;=[]+#?/im;
 
 const {
   getCards,

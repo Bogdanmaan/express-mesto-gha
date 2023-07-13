@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       // eslint-disable-next-line no-useless-escape
-      validator: (v) => /http[s]?:\/\/(www\.)?[\w\d\-\._~:\?#@!$&'()*+,;=[]+#?/gim.test(v),
+      validator: (v) => /http[s]?:\/\/(www\.)?[\w\d\-\._~:\?#@!$&'()*+,;=[]+#?/im.test(v),
       message: 'Неверная ссылка',
     },
   },
