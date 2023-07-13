@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
   // убеждаемся, что он есть или начинается с Bearer
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return new AuthError({ message: 'Необходима авторизация' });
+    return res.status(401).send({ message: 'Необходима авторизация' });
   }
 
   const token = authorization.replace('Bearer ', '');
