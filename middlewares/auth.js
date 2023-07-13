@@ -22,7 +22,7 @@ const Auth = (req, res, next) => {
   }
 
   req.user = payload;
-  return next();
+  next();
 };
 
 module.exports = Auth;
