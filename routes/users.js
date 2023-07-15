@@ -18,6 +18,8 @@ router.get(
   celebrate({
     body: Joi.object().keys({
       _id: Joi.string().length(24).hex().required(),
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
     }),
   }),
   getUserById,

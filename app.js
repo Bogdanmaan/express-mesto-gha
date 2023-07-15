@@ -8,6 +8,8 @@ const { errors, celebrate, Joi } = require('celebrate');
 
 const { createUser, login } = require('./controllers/users');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const userRouter = require('./routes/users');
 
 const cardRouter = require('./routes/cards');
@@ -26,9 +28,11 @@ const app = express();
 
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
 });
+
+app.use(requestLogger);
 
 app.post(
   '/signup',
@@ -70,11 +74,15 @@ app.use(userRouter);
 
 app.use(cardRouter);
 
+app.use(errorLogger);
+
+app.use(errors());
+
+app.use(errorHandler);
+
 app.use('*', (req, res, next) => {
   next(new NotFoundError({ message: 'Несуществующий адрес' }));
 });
-app.use(errorHandler);
-app.use(errors());
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
